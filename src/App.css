@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: rgb(114, 9, 183);
+  --color-primary50: rgba(114, 9, 183, 0.5);
+  --color-red: #cb0000;
+  --color-black100: #353535;
+  --color-black75: #676767;
+  --color-black50: #9b9b9b;
+  --color-black25: #cdcdcd;
+  --color-white98: #fafafa;
+  --color-white97: #f7f7f8;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Poppins';
+}
+
+body {
+  font-size: 18px;
+}
+
+button {
+  font-size: 15px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
