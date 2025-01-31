@@ -3,7 +3,11 @@
 @theme {
   --color-primary: rgb(114, 9, 183);
   --color-primary50: rgba(114, 9, 183, 0.5);
+  --color-darkprimary: #550788;
+  --color-darkred: #880735;
   --color-red: #cb0000;
+  --color-blue: #0055ff;
+  --color-green: #00da16;
   --color-black100: #353535;
   --color-black75: #676767;
   --color-black50: #9b9b9b;
@@ -12,23 +16,35 @@
   --color-white97: #f7f7f8;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 html {
-  font-family: 'Poppins';
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
 }
 
 body {
   font-size: 18px;
 }
 
-button {
-  font-size: 15px;
-  border: none;
-  outline: none;
+button:not(:disabled) {
   cursor: pointer;
+  transition: background-color 0.25s ease-in-out;
+  font-family: 'Poppins';
+}
+
+.bg-background {
+  background-size: cover;
+  background-position: center;
+  background-image: url(./assets/icons/startimage.svg);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
