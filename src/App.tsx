@@ -77,7 +77,11 @@ function App() {
           className={`${!isTextActive && !draggableImage ? 'bg-background' : ''} bg-black50 h-full max-w-[762px] flex-grow`}
           style={
             backgroundImage
-              ? { backgroundImage: `url(${backgroundImage})` }
+              ? {
+                  backgroundImage: `url(${backgroundImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
               : {}
           }
         >

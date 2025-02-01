@@ -45,6 +45,7 @@ export function Draggable({
   const [position, setPosition] = useState(defaultPosition)
   const [initPosition, setInitPosition] = useState(defaultPosition)
   const [size, setSize] = useState(initSize || { w: 128, h: 128 })
+  const [fontSize, setFontSize] = useState(32)
   const handleRef = useRef<HTMLDivElement | null>(null)
   const [textColor, setTextColor] = useState(textColors[0])
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -69,6 +70,16 @@ export function Draggable({
       })
     }
   }, [transform])
+
+  useEffect(() => {
+    if (droppableDimensions) {
+      const fz = Math.max(
+        32,
+        Math.min(96, Math.round((192 * size.h) / droppableDimensions.height))
+      )
+      setFontSize(fz)
+    }
+  }, [size])
 
   const style: React.CSSProperties = {
     left: position.x,
@@ -165,8 +176,8 @@ export function Draggable({
         <>
           <textarea
             placeholder="Type your text here"
-            className={`placeholder:text-black100 h-full w-full resize-none overflow-hidden px-6 py-3 text-center text-[32px] font-bold outline-none placeholder:opacity-25`}
-            style={{ color: textColor }}
+            className={`placeholder:text-black100 h-full w-full resize-none overflow-hidden px-6 py-3 text-center font-bold outline-none placeholder:opacity-25`}
+            style={{ color: textColor, fontSize: `${fontSize}px` }}
             value={text}
             onChange={(e) => changeText(e)}
             onMouseDown={handleSetEditMode}
@@ -177,7 +188,7 @@ export function Draggable({
                 <div
                   role={'button'}
                   tabIndex={0}
-                  className="focus:ring-primary50 h-4 w-4 cursor-pointer rounded-full focus:ring-2"
+                  className={`h-4 w-4 cursor-pointer rounded-full outline- ${t === textColor ? 'ring-2 ring-white ring- ring-offset-2 ring-offset-black50' : ''}`}
                   style={{ backgroundColor: t }}
                   onMouseDown={(e) => handleSetTextColor(e, t)}
                 ></div>
