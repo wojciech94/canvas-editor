@@ -16,7 +16,7 @@ export const Button: React.FC<ButtonProps> = ({
   switch (variant) {
     case 'primary':
       variantClasses =
-        'text-[15px] bg-primary text-white px-8 h-10 rounded-[5px] tracking-[.5px] hover:bg-darkprimary'
+        'text-[15px] bg-primary text-white px-8 h-10 rounded-[5px] tracking-[.5px] hover:bg-darkprimary focus:outline-2 outline-primary50 disabled:bg-black25 disabled:cursor-not-allowed'
       break
     case 'text':
       variantClasses = 'text-lg text-black100'

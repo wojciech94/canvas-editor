@@ -1,14 +1,17 @@
 import { useDraggable } from '@dnd-kit/core'
-import { useState, useEffect, useRef, ChangeEvent } from 'react'
+import { useState, useEffect, useRef, ChangeEvent, useMemo } from 'react'
 import Move from '../assets/icons/move.svg'
 import Delete from '../assets/icons/delete.svg'
 import { Dimensions } from '../App.js'
+import * as React from 'react'
 
 type Size = { w: number; h: number }
 
 interface DraggableProps {
   type?: 'text' | 'image'
   id: string
+  isEditMode: boolean
+  setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>
   onDragRemove: () => void
   onTextChange?: (e: string) => void
   children?: React.ReactNode
@@ -27,6 +30,8 @@ export function Draggable({
   children,
   text,
   droppableDimensions,
+  isEditMode,
+  setIsEditMode,
   initSize = type === 'text' ? { w: 350, h: 120 } : { w: 128, h: 128 },
 }: DraggableProps) {
   const defaultPosition =
@@ -47,15 +52,17 @@ export function Draggable({
     data: { type },
   })
 
+  const dimOffset = useMemo(() => {
+    return droppableDimensions && size
+      ? {
+          x: droppableDimensions.width - size.w,
+          y: droppableDimensions.height - size.h,
+        }
+      : { x: 0, y: 0 }
+  }, [droppableDimensions, size])
+
   useEffect(() => {
     if (transform) {
-      const dimOffset =
-        droppableDimensions && size
-          ? {
-              x: droppableDimensions.width - size.w,
-              y: droppableDimensions.height - size.h,
-            }
-          : { x: 0, y: 0 }
       setPosition({
         x: Math.min(Math.max(initPosition.x + transform.x, 0), dimOffset.x),
         y: Math.min(Math.max(initPosition.y + transform.y, 0), dimOffset.y),
@@ -71,6 +78,9 @@ export function Draggable({
   }
 
   const changeText = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    if (!isEditMode) {
+      setIsEditMode(true)
+    }
     if (onTextChange) {
       onTextChange(e.target.value)
     }
@@ -78,75 +88,107 @@ export function Draggable({
 
   const handleResizeStart = (e: React.MouseEvent) => {
     e.preventDefault()
+    e.stopPropagation()
+    if (droppableDimensions) {
+      const startX = e.clientX
+      const startY = e.clientY
+      const startWidth = size.w
+      const startHeight = size.h
 
-    const startX = e.clientX
-    const startY = e.clientY
-    const startWidth = size.w
-    const startHeight = size.h
+      const handleMouseMove = (e: MouseEvent) => {
+        const maxW = droppableDimensions.width - position.x
+        const maxH = droppableDimensions.height - position.y
+        const newWidth = Math.min(
+          Math.max(minSize.w, startWidth + (e.clientX - startX)),
+          maxW
+        )
+        const newHeight = Math.min(
+          Math.max(minSize.h, startHeight + (e.clientY - startY)),
+          maxH
+        )
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = Math.max(minSize.w, startWidth + (e.clientX - startX))
-      const newHeight = Math.max(minSize.h, startHeight + (e.clientY - startY))
+        setSize({ w: newWidth, h: newHeight })
+      }
 
-      setSize({ w: newWidth, h: newHeight })
+      const handleMouseUp = () => {
+        window.removeEventListener('mousemove', handleMouseMove)
+        window.removeEventListener('mouseup', handleMouseUp)
+      }
+
+      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mouseup', handleMouseUp)
     }
+  }
 
-    const handleMouseUp = () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }
+  const handleSetEditMode = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsEditMode(true)
+  }
 
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
+  const handleSetTextColor = (e: React.MouseEvent, val: string) => {
+    e.stopPropagation()
+    setTextColor(val)
   }
 
   return (
     <div
       ref={setNodeRef}
-      className={`border-primary absolute z-40 border-2 ${type === 'text' ? 'px-6 py-3' : ''}`}
+      className={`${isEditMode ? '!border-primary' : ''} absolute z-40 border-2 border-transparent`}
       style={style}
       onMouseUp={() => setInitPosition({ x: position.x, y: position.y })}
     >
-      <div
-        ref={handleRef}
-        className="absolute -top-5 -left-5 cursor-grab rounded-full bg-white"
-        {...listeners}
-        {...attributes}
-      >
-        <img src={Move} alt="Move cursor icon"></img>
-      </div>
-      <div
-        className="absolute -top-3 -right-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-white"
-        onClick={onDragRemove}
-      >
-        <img src={Delete} alt="Trash icon" width={18}></img>
-      </div>
-      <div
-        className="bg-primary absolute -right-3 -bottom-3 flex h-6 w-6 cursor-nwse-resize items-center justify-center rounded-full border-4 border-white"
-        onMouseDown={handleResizeStart}
-      ></div>
+      {isEditMode && (
+        <>
+          <div
+            ref={handleRef}
+            className="absolute -top-5 -left-5 cursor-grab rounded-full bg-white"
+            {...listeners}
+            {...attributes}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <img src={Move} alt="Move cursor icon"></img>
+          </div>
+          <div
+            className="absolute -top-3 -right-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-white"
+            onMouseDown={onDragRemove}
+          >
+            <img src={Delete} alt="Trash icon" width={18}></img>
+          </div>
+          <div
+            className="bg-primary absolute -right-3 -bottom-3 flex h-6 w-6 cursor-nwse-resize items-center justify-center rounded-full border-4 border-white"
+            onMouseDown={handleResizeStart}
+          ></div>
+        </>
+      )}
+
       {type === 'text' ? (
         <>
           <textarea
             placeholder="Type your text here"
-            className="placeholder:text-black100 h-full w-full resize-none overflow-hidden text-center text-[32px] font-bold outline-none placeholder:opacity-25"
+            className={`placeholder:text-black100 h-full w-full resize-none overflow-hidden px-6 py-3 text-center text-[32px] font-bold outline-none placeholder:opacity-25`}
             style={{ color: textColor }}
             value={text}
             onChange={(e) => changeText(e)}
+            onMouseDown={handleSetEditMode}
           ></textarea>
-          <div className="absolute -bottom-6 left-0 flex gap-3">
-            {textColors.map((t) => (
-              <div
-                role={'button'}
-                className="h-4 w-4 cursor-pointer rounded-full"
-                style={{ backgroundColor: t }}
-                onClick={() => setTextColor(t)}
-              ></div>
-            ))}
-          </div>
+          {isEditMode && (
+            <div className="absolute -bottom-6 left-0 flex gap-3">
+              {textColors.map((t) => (
+                <div
+                  role={'button'}
+                  tabIndex={0}
+                  className="focus:ring-primary50 h-4 w-4 cursor-pointer rounded-full focus:ring-2"
+                  style={{ backgroundColor: t }}
+                  onMouseDown={(e) => handleSetTextColor(e, t)}
+                ></div>
+              ))}
+            </div>
+          )}
         </>
       ) : (
-        <div className="h-full w-full">{children}</div>
+        <div className="h-full w-full" onMouseDown={handleSetEditMode}>
+          {children}
+        </div>
       )}
     </div>
   )

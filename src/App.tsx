@@ -22,6 +22,7 @@ function App() {
   const [draggableText, setDraggableText] = useState<string>('')
   const [isTextActive, setIsTextActive] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(true)
   const [draggableImage, setDraggableImage] = useState<string | null>(null)
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
   const [droppableDimensions, setDroppableDimensions] =
@@ -66,6 +67,7 @@ function App() {
     setIsTextActive(false)
     setDraggableImage(null)
     setBackgroundImage(null)
+    setIsModalOpen(false)
   }
 
   return (
@@ -79,22 +81,18 @@ function App() {
               : {}
           }
         >
-          <Droppable setDroppableDimensions={setDroppableDimensions}>
-            {isTextActive && (
-              <Draggable
-                id="dragtext"
-                onDragRemove={() => handleDragRemove('text')}
-                onTextChange={handleTextChange}
-                text={draggableText}
-                droppableDimensions={droppableDimensions}
-              ></Draggable>
-            )}
+          <Droppable
+            setDroppableDimensions={setDroppableDimensions}
+            setIsEditMode={setIsEditMode}
+          >
             {draggableImage && (
               <Draggable
                 id="dragimage"
                 type="image"
                 onDragRemove={() => handleDragRemove('image')}
                 droppableDimensions={droppableDimensions}
+                isEditMode={isEditMode}
+                setIsEditMode={setIsEditMode}
               >
                 <img
                   src={draggableImage}
@@ -102,6 +100,17 @@ function App() {
                   className="h-full w-full object-cover"
                 />
               </Draggable>
+            )}
+            {isTextActive && (
+              <Draggable
+                id="dragtext"
+                onDragRemove={() => handleDragRemove('text')}
+                onTextChange={handleTextChange}
+                text={draggableText}
+                droppableDimensions={droppableDimensions}
+                isEditMode={isEditMode}
+                setIsEditMode={setIsEditMode}
+              ></Draggable>
             )}
           </Droppable>
         </div>

@@ -5,11 +5,13 @@ import { Dimensions } from '../App.js'
 type Props = {
   children: ReactNode
   setDroppableDimensions: Dispatch<SetStateAction<Dimensions | null>>
+  setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const Droppable: React.FC<Props> = ({
   children,
   setDroppableDimensions,
+  setIsEditMode,
 }) => {
   const { setNodeRef } = useDroppable({
     id: 'droppable',
@@ -42,14 +44,15 @@ export const Droppable: React.FC<Props> = ({
     }
   }
 
+  const onDroppableClick = () => {
+    setIsEditMode(false)
+  }
+
   return (
     <div
       ref={droppableRef}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-      }}
+      className="relative h-full w-full overflow-hidden"
+      onMouseDown={onDroppableClick}
     >
       {children}
     </div>
