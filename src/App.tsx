@@ -9,9 +9,10 @@ import { DndContext } from '@dnd-kit/core'
 
 import { Draggable } from './components/Draggable.js'
 import { Droppable } from './components/Droppable.js'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useRef, useState } from 'react'
 import { FileInput } from './components/FileInput.js'
 import { Modal } from './components/Modal.js'
+import html2canvas from 'html2canvas'
 
 export type Dimensions = {
   width: number
@@ -27,6 +28,8 @@ function App() {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
   const [droppableDimensions, setDroppableDimensions] =
     useState<Dimensions | null>(null)
+  const [topElement, setTopElement] = useState<'text' | 'image'>('text')
+  const exportRef = useRef(null)
 
   const handleDragRemove = (type: 'text' | 'image') => {
     if (type === 'text') {
@@ -70,20 +73,38 @@ function App() {
     setIsModalOpen(false)
   }
 
+  const handleExportImage = async () => {
+    if (exportRef.current) {
+      const html2canvasFunc = (html2canvas as any).default || html2canvas
+      const canvas = await html2canvasFunc(exportRef.current, {
+        width: 1080,
+        height: 1350,
+        backgroundColor: null,
+      })
+      const image = canvas.toDataURL('image/png')
+
+      const link = document.createElement('a')
+      link.href = image
+      link.download = 'exported-canvas.png'
+      link.click()
+    }
+  }
+
+  const bgStyle = backgroundImage
+    ? {
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    : {}
+
   return (
     <DndContext>
-      <div className="flex h-screen items-center justify-center gap-6 p-8">
+      <div className="flex h-screen w-full flex-wrap justify-center gap-6 p-8">
         <div
-          className={`${!isTextActive && !draggableImage ? 'bg-background' : ''} bg-black50 h-full max-w-[762px] flex-grow`}
-          style={
-            backgroundImage
-              ? {
-                  backgroundImage: `url(${backgroundImage})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }
-              : {}
-          }
+          ref={exportRef}
+          className={`${!isTextActive && !draggableImage ? 'bg-background' : ''} bg-black50 bg-order order-2 aspect-[4/5] h-full max-w-[762px] flex-1`}
+          style={bgStyle}
         >
           <Droppable
             setDroppableDimensions={setDroppableDimensions}
@@ -97,6 +118,8 @@ function App() {
                 droppableDimensions={droppableDimensions}
                 isEditMode={isEditMode}
                 setIsEditMode={setIsEditMode}
+                setTopElement={setTopElement}
+                className={`${topElement === 'image' ? 'z-20' : 'z-10'}`}
               >
                 <img
                   src={draggableImage}
@@ -114,11 +137,13 @@ function App() {
                 droppableDimensions={droppableDimensions}
                 isEditMode={isEditMode}
                 setIsEditMode={setIsEditMode}
+                setTopElement={setTopElement}
+                className={`${topElement === 'text' ? 'z-20' : 'z-10'}`}
               ></Draggable>
             )}
           </Droppable>
         </div>
-        <div className="flex h-full max-w-[762px] flex-grow flex-col gap-8">
+        <div className="order-1 flex min-h-[800px] max-w-[762px] min-w-[420px] flex-1 flex-col gap-8">
           <div className="text-primary flex items-center gap-3">
             <img src={Logo} alt="Logo" width={64}></img>
             <div className="flex-grow text-[32px] font-bold">CanvasEditor</div>
@@ -138,21 +163,31 @@ function App() {
             <Button
               variant="tile"
               icon={Icon}
-              onClick={() => setIsTextActive(true)}
+              disabled={isTextActive}
+              onClick={() => {
+                setIsTextActive(true)
+                setTopElement('text')
+              }}
             >
               <span className="leading-6">Text</span>
             </Button>
-            <FileInput onChange={(e) => handleImageChange(e, false)}>
+            <FileInput
+              disabled={draggableImage !== null}
+              onChange={(e) => handleImageChange(e, false)}
+            >
               <img src={Img} alt="Image icon" width={128}></img>
               <span className="leading-6">Image</span>
             </FileInput>
-            <FileInput onChange={(e) => handleImageChange(e, true)}>
+            <FileInput
+              disabled={backgroundImage !== null}
+              onChange={(e) => handleImageChange(e, true)}
+            >
               <img src={Background} alt="Background icon" width={128}></img>
               <span className="leading-6">Background</span>
             </FileInput>
           </div>
           <div className="flex flex-grow items-end justify-end">
-            <Button>Export to PNG</Button>
+            <Button onClick={handleExportImage}>Export to PNG</Button>
           </div>
         </div>
       </div>

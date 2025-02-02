@@ -11,13 +11,15 @@ interface DraggableProps {
   type?: 'text' | 'image'
   id: string
   isEditMode: boolean
-  setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>
-  onDragRemove: () => void
-  onTextChange?: (e: string) => void
   children?: React.ReactNode
+  className?: string
   text?: string
   droppableDimensions: Dimensions | null
   initSize?: Size | null
+  setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>
+  setTopElement: React.Dispatch<React.SetStateAction<'text' | 'image'>>
+  onDragRemove: () => void
+  onTextChange?: (e: string) => void
 }
 
 const textColors = ['#353535', '#FFFFFF', '#cb0000', '#0055ff', '#00da16']
@@ -25,13 +27,15 @@ const textColors = ['#353535', '#FFFFFF', '#cb0000', '#0055ff', '#00da16']
 export function Draggable({
   type = 'text',
   id,
-  onDragRemove,
-  onTextChange,
   children,
+  className,
   text,
   droppableDimensions,
   isEditMode,
+  onDragRemove,
+  onTextChange,
   setIsEditMode,
+  setTopElement,
   initSize = type === 'text' ? { w: 350, h: 120 } : { w: 128, h: 128 },
 }: DraggableProps) {
   const defaultPosition =
@@ -80,13 +84,6 @@ export function Draggable({
       setFontSize(fz)
     }
   }, [size])
-
-  const style: React.CSSProperties = {
-    left: position.x,
-    top: position.y,
-    width: size.w,
-    height: size.h,
-  }
 
   const changeText = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (!isEditMode) {
@@ -141,12 +138,22 @@ export function Draggable({
     setTextColor(val)
   }
 
+  const style: React.CSSProperties = {
+    left: position.x,
+    top: position.y,
+    width: size.w,
+    height: size.h,
+  }
+
   return (
     <div
       ref={setNodeRef}
-      className={`${isEditMode ? '!border-primary' : ''} absolute z-40 border-2 border-transparent`}
+      className={`${isEditMode ? '!border-primary' : ''} absolute border-2 border-transparent ${className ? className : ''}`}
       style={style}
-      onMouseUp={() => setInitPosition({ x: position.x, y: position.y })}
+      onMouseUp={() => {
+        setInitPosition({ x: position.x, y: position.y })
+        setTopElement(type)
+      }}
     >
       {isEditMode && (
         <>
@@ -188,7 +195,7 @@ export function Draggable({
                 <div
                   role={'button'}
                   tabIndex={0}
-                  className={`h-4 w-4 cursor-pointer rounded-full outline- ${t === textColor ? 'ring-2 ring-white ring- ring-offset-2 ring-offset-black50' : ''}`}
+                  className={`outline- h-4 w-4 cursor-pointer rounded-full ${t === textColor ? 'ring- ring-offset-black50 ring-2 ring-white ring-offset-2' : ''}`}
                   style={{ backgroundColor: t }}
                   onMouseDown={(e) => handleSetTextColor(e, t)}
                 ></div>
