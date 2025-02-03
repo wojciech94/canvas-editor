@@ -40,6 +40,7 @@ export const Droppable: React.FC<Props> = ({
   const calculateDimensions = () => {
     if (droppableRef.current) {
       let { width, height } = droppableRef.current.getBoundingClientRect()
+      height = width * 1.2
       setDroppableDimensions({ width, height })
     }
   }

@@ -100,10 +100,10 @@ function App() {
 
   return (
     <DndContext>
-      <div className="flex h-screen w-full flex-wrap justify-center gap-6 p-8">
+      <div className="flex h-screen w-full flex-wrap justify-center gap-6 p-8 xl:flex-nowrap">
         <div
           ref={exportRef}
-          className={`${!isTextActive && !draggableImage ? 'bg-background' : ''} bg-black50 bg-order order-2 aspect-[4/5] h-full max-w-[762px] flex-1`}
+          className={`${!isTextActive && !draggableImage ? 'bg-background' : ''} bg-black50 bg-order order-2 aspect-[4/5] h-full max-w-[762px]`}
           style={bgStyle}
         >
           <Droppable
@@ -143,7 +143,7 @@ function App() {
             )}
           </Droppable>
         </div>
-        <div className="order-1 flex min-h-[800px] max-w-[762px] min-w-[420px] flex-1 flex-col gap-8">
+        <div className="order-1 flex max-w-[762px] flex-col gap-8 xl:order-2 xl:min-w-[450px]">
           <div className="text-primary flex items-center gap-3">
             <img src={Logo} alt="Logo" width={64}></img>
             <div className="flex-grow text-[32px] font-bold">CanvasEditor</div>

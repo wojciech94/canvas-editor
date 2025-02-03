@@ -48,9 +48,3 @@ button:not(:disabled) {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
 }
-
-@media (min-width: 1082px) {
-  .bg-order {
-    order: 1;
-  }
-}

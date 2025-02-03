@@ -24,7 +24,7 @@ export const Button: React.FC<ButtonProps> = ({
       break
     case 'tile':
       variantClasses =
-        'flex-col gap-[25px] h-64 w-[365px] justify-end bg-white97 rounded-[10px] py-3 hover:bg-black25 disabled:bg-white98 disabled:cursor-not-allowed disabled:opacity-25 focus:outline-2 outline-primary50'
+        'flex-1 flex-col gap-[25px] h-64 min-w-[270px] xl:max-w-[365px] justify-end bg-white97 rounded-[10px] py-3 hover:bg-black25 disabled:bg-white98 disabled:cursor-not-allowed disabled:opacity-25 focus:outline-2 outline-primary50'
       break
   }
   const classes = `font-semibold flex gap-2 items-center ${variantClasses} ${className ? className : ''}`

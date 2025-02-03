@@ -15,7 +15,7 @@ export const FileInput = ({ onChange, children, disabled }: Props) => {
   return (
     <button
       disabled={disabled}
-      className="bg-white97 hover:bg-black25 disabled:bg-white98 outline-primary50 relative flex h-64 w-[365px] cursor-pointer flex-col items-center justify-end rounded-[10px] py-3 text-[15px] font-semibold focus:outline-2 disabled:cursor-not-allowed disabled:opacity-25"
+      className="bg-white97 hover:bg-black25 disabled:bg-white98 outline-primary50 relative flex h-64 min-w-[270px] flex-1 cursor-pointer flex-col items-center justify-end rounded-[10px] py-3 text-[15px] font-semibold focus:outline-2 disabled:cursor-not-allowed disabled:opacity-25 xl:max-w-[365px]"
       onMouseDown={handleFocus}
     >
       <input
