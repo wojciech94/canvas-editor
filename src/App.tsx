@@ -167,13 +167,17 @@ function App() {
               onClick={() => {
                 setIsTextActive(true)
                 setTopElement('text')
+                setIsEditMode(true)
               }}
             >
               <span className="leading-6">Text</span>
             </Button>
             <FileInput
               disabled={draggableImage !== null}
-              onChange={(e) => handleImageChange(e, false)}
+              onChange={(e) => {
+                handleImageChange(e, false)
+                setIsEditMode(true)
+              }}
             >
               <img src={Img} alt="Image icon" width={128}></img>
               <span className="leading-6">Image</span>

@@ -1,4 +1,4 @@
-import Alert from '../assets/icons/Alert.svg'
+import Alert from '../assets/icons/alert.svg'
 import { Button } from './Button.js'
 import Close from '../assets/icons/close.svg'
 
