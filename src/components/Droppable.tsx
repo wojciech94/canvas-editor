@@ -52,7 +52,7 @@ export const Droppable: React.FC<Props> = ({
   return (
     <div
       ref={droppableRef}
-      className="relative h-full w-full overflow-hidden"
+      className="relative h-full w-full"
       onMouseDown={onDroppableClick}
     >
       {children}
